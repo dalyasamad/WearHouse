@@ -11,6 +11,7 @@ import {
 } from "react-router-dom";
 
 import ConfirmModal from "../components/ConfirmModal";
+import { getAssetUrl } from "../config/api";
 
 import {
   getOutfits,
@@ -309,9 +310,7 @@ function SavedOutfits() {
                             >
                               {item.image_url ? (
                                 <img
-                                  src={
-                                    item.image_url
-                                  }
+                                  src={getAssetUrl(item.image_url)}
                                   alt={
                                     item.name
                                   }

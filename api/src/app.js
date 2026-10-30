@@ -5,6 +5,7 @@ const rateLimit = require("express-rate-limit");
 const express = require("express");
 const cors = require("cors");
 const path = require("path");
+const errorHandler =require("./middleware/errorHandler");
 
 const authRoutes = require("./routes/authRoutes");
 const userRoutes = require("./routes/userRoutes");
@@ -13,9 +14,16 @@ const outfitRoutes =require("./routes/outfitRoutes");
 const scheduleRoutes = require("./routes/scheduleRoutes");
 const historyRoutes =require("./routes/historyRoutes");
 
+
 const app = express();
 
-app.use(helmet());
+app.use(
+  helmet({
+    crossOriginResourcePolicy: {
+      policy: "cross-origin",
+    },
+  })
+);
 
 app.use(
   cors({
@@ -75,5 +83,6 @@ app.get("/", (req, res) => {
     message: "WearHouse API Running",
   });
 });
+app.use(errorHandler);
 
 module.exports = app;

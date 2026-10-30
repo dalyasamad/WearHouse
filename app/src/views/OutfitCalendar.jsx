@@ -15,6 +15,7 @@ import CustomDropdown from "../components/CustomDropdown";
 import {
   getOutfits,
 } from "../services/outfitService";
+import CalendarDay from "../components/CalendarDay";
 
 import {
   getSchedules,
@@ -67,28 +68,28 @@ function OutfitCalendar() {
     useState("");
 
   useEffect(() => {
-  async function loadCalendarData() {
-    try {
-      setLoading(true);
-      setError("");
+    async function loadCalendarData() {
+      try {
+        setLoading(true);
+        setError("");
 
-      const [outfitData, scheduleData] =
-        await Promise.all([
-          getOutfits(),
-          getSchedules(),
-        ]);
+        const [outfitData, scheduleData] =
+          await Promise.all([
+            getOutfits(),
+            getSchedules(),
+          ]);
 
-      setOutfits(outfitData);
-      setSchedules(scheduleData);
-    } catch (error) {
-      setError(error.message);
-    } finally {
-      setLoading(false);
+        setOutfits(outfitData);
+        setSchedules(scheduleData);
+      } catch (error) {
+        setError(error.message);
+      } finally {
+        setLoading(false);
+      }
     }
-  }
 
-  loadCalendarData();
-}, []);
+    loadCalendarData();
+  }, []);
 
   async function refreshSchedules() {
     const data =
@@ -338,7 +339,7 @@ function OutfitCalendar() {
       new Date(
         Number(selectedYear),
         Number(selectedMonth) -
-          1,
+        1,
         Number(selectedDay)
       );
 
@@ -362,11 +363,11 @@ function OutfitCalendar() {
   const selectedSchedule =
     selectedDate
       ? schedules.find(
-          (schedule) =>
-            normalizeDate(
-              schedule.scheduled_date
-            ) === selectedDate
-        )
+        (schedule) =>
+          normalizeDate(
+            schedule.scheduled_date
+          ) === selectedDate
+      )
       : null;
 
   return (
@@ -456,69 +457,32 @@ function OutfitCalendar() {
                   }
 
                   const dateString =
-                    createDateString(
-                      day
-                    );
+                    createDateString(day);
 
                   const scheduled =
-                    getScheduledOutfit(
-                      day
-                    );
+                    getScheduledOutfit(day);
 
                   return (
-                    <div
-                      key={
-                        dateString
-                      }
-                      className={`calendar-day ${
+                    <CalendarDay
+                      key={dateString}
+                      day={day}
+                      dateString={dateString}
+                      selected={
                         selectedDate ===
                         dateString
-                          ? "selected"
-                          : ""
-                      }`}
-                      onClick={() =>
-                        handleSelectDate(
-                          dateString,
-                          scheduled
-                        )
                       }
-                    >
-                      <span className="day-number">
-                        {day}
-                      </span>
-
-                      {scheduled && (
-                        <div className="scheduled-outfit">
-                          <span>
-                            {
-                              scheduled.outfit_name
-                            }
-                          </span>
-
-                          <button
-                            type="button"
-                            disabled={
-                              removingScheduleId ===
-                              scheduled.schedule_id
-                            }
-                            onClick={(
-                              event
-                            ) => {
-                              event.stopPropagation();
-
-                              handleRemoveSchedule(
-                                scheduled
-                              );
-                            }}
-                          >
-                            {removingScheduleId ===
-                            scheduled.schedule_id
-                              ? "…"
-                              : "×"}
-                          </button>
-                        </div>
-                      )}
-                    </div>
+                      scheduled={scheduled}
+                      removing={
+                        removingScheduleId ===
+                        scheduled?.schedule_id
+                      }
+                      onSelect={
+                        handleSelectDate
+                      }
+                      onRemoveSchedule={
+                        handleRemoveSchedule
+                      }
+                    />
                   );
                 }
               )}
@@ -539,7 +503,7 @@ function OutfitCalendar() {
                 </p>
 
                 {outfits.length >
-                0 ? (
+                  0 ? (
                   <>
                     <div className="form-group">
                       <label>
@@ -592,8 +556,8 @@ function OutfitCalendar() {
                       {saving
                         ? "Saving..."
                         : selectedSchedule
-                        ? "Update Calendar"
-                        : "Save to Calendar"}
+                          ? "Update Calendar"
+                          : "Save to Calendar"}
                     </button>
                   </>
                 ) : (

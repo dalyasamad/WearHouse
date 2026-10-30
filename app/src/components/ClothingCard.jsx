@@ -2,6 +2,7 @@
 
 
 import { useNavigate } from "react-router-dom";
+import { getAssetUrl } from "../config/api";
 
 // Renders the reusable ClothingCard interface component.
 function ClothingCard({ item, onToggleFavorite }) {
@@ -24,9 +25,9 @@ function ClothingCard({ item, onToggleFavorite }) {
       <div className="clothing-image">
         {item.image_url ? (
           <img
-            src={item.image_url}
-            alt={item.name}
-          />
+  src={getAssetUrl(item.image_url)}
+  alt={item.name}
+/>
         ) : (
           <div className="clothing-image-placeholder">
             <span>No Image</span>
