@@ -67,21 +67,16 @@ function OutfitCalendar() {
     useState("");
 
   useEffect(() => {
-    loadCalendarData();
-  }, []);
-
   async function loadCalendarData() {
     try {
       setLoading(true);
       setError("");
 
-      const [
-        outfitData,
-        scheduleData,
-      ] = await Promise.all([
-        getOutfits(),
-        getSchedules(),
-      ]);
+      const [outfitData, scheduleData] =
+        await Promise.all([
+          getOutfits(),
+          getSchedules(),
+        ]);
 
       setOutfits(outfitData);
       setSchedules(scheduleData);
@@ -91,6 +86,9 @@ function OutfitCalendar() {
       setLoading(false);
     }
   }
+
+  loadCalendarData();
+}, []);
 
   async function refreshSchedules() {
     const data =

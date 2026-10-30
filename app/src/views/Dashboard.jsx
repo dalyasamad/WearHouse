@@ -56,10 +56,7 @@ function Dashboard() {
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState("");
 
-  useEffect(() => {
-    loadDashboard();
-  }, []);
-
+ useEffect(() => {
   async function loadDashboard() {
     try {
       setLoading(true);
@@ -87,6 +84,9 @@ function Dashboard() {
       setLoading(false);
     }
   }
+
+  loadDashboard();
+}, []);
 
   const favoriteItems = clothing
     .filter((item) => item.is_favorite)

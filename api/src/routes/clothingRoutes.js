@@ -28,7 +28,7 @@ router.post( "/upload", upload.single("image"),(req, res) => {
             });
         }
 
-        const imageUrl =`http://localhost:3000/uploads/${req.file.filename}`;
+        const imageUrl = `/uploads/${req.file.filename}`;
 
         return res.status(201).json({image_url: imageUrl,});
     }

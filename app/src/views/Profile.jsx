@@ -71,37 +71,36 @@ function Profile() {
   ] = useState(false);
 
   useEffect(() => {
-    loadProfile();
-  }, []);
+    async function loadProfile() {
+      try {
+        setLoading(true);
+        setServerError("");
 
-  async function loadProfile() {
-    try {
-      setLoading(true);
-      setServerError("");
+        const token =
+          localStorage.getItem(
+            "wearhouse_token"
+          );
 
-      const token =
-        localStorage.getItem(
-          "wearhouse_token"
-        );
+        const user =
+          await getCurrentUser(token);
 
-      const user =
-        await getCurrentUser(token);
-
-      setValues({
-        first_name:
-          user.first_name || "",
-        last_name:
-          user.last_name || "",
-        email:
-          user.email || "",
-      });
-    } catch (error) {
-      setServerError(error.message);
-    } finally {
-      setLoading(false);
+        setValues({
+          first_name:
+            user.first_name || "",
+          last_name:
+            user.last_name || "",
+          email:
+            user.email || "",
+        });
+      } catch (error) {
+        setServerError(error.message);
+      } finally {
+        setLoading(false);
+      }
     }
-  }
 
+    loadProfile();
+  }, [setValues]);
   async function handleSave(event) {
     event.preventDefault();
 
@@ -155,9 +154,8 @@ function Profile() {
   }
 
   const initials =
-    `${values.first_name?.[0] || ""}${
-      values.last_name?.[0] || ""
-    }`.toUpperCase();
+    `${values.first_name?.[0] || ""}${values.last_name?.[0] || ""
+      }`.toUpperCase();
 
   if (loading) {
     return (
@@ -187,11 +185,11 @@ function Profile() {
 
       {(errors.form ||
         serverError) && (
-        <p className="auth-error">
-          {errors.form ||
-            serverError}
-        </p>
-      )}
+          <p className="auth-error">
+            {errors.form ||
+              serverError}
+          </p>
+        )}
 
       {success && (
         <div className="profile-success">

@@ -43,24 +43,24 @@ function ClothingDetails() {
   ] = useState(false);
 
   useEffect(() => {
+    async function loadItem() {
+      try {
+        setLoading(true);
+        setError("");
+
+        const data = await getClothingItem(id);
+
+        setItem(data);
+      } catch (error) {
+        setError(error.message);
+      } finally {
+        setLoading(false);
+      }
+    }
+
     loadItem();
   }, [id]);
 
-  async function loadItem() {
-    try {
-      setLoading(true);
-      setError("");
-
-      const data =
-        await getClothingItem(id);
-
-      setItem(data);
-    } catch (error) {
-      setError(error.message);
-    } finally {
-      setLoading(false);
-    }
-  }
 
   async function confirmDelete() {
     try {

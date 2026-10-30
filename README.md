@@ -1,75 +1,80 @@
 # WearHouse
 
-WearHouse is a full-stack digital wardrobe management application developed for **CSIS 279 – Advances in Computer Science** at the University of Balamand.
+WearHouse is a full-stack digital wardrobe and outfit-planning web application developed for CSIS 279 – Advances in Computer Science at the University of Balamand.
 
-The application allows users to organize their clothing, create outfits, schedule outfits on a calendar, track outfits they have worn, and manage their personal wardrobe through a clean and responsive interface.
+The application allows users to organize clothing digitally, create and save outfits, schedule outfits on a calendar, record outfits as worn, and manage their personal wardrobe.
 
 ## Main Features
 
-### User Authentication
-- User registration
-- User login
+### Authentication and Account Management
+
+- User registration and login
 - JWT-based authentication
-- Protected application routes
-- Automatic redirect to login when a session expires
-- Logout
+- Password hashing with bcrypt
+- Protected frontend and backend routes
 - Profile editing
+- Logout
 - Account deletion
+- User-specific data isolation
 
 ### Digital Wardrobe
+
 - Add clothing items
 - Upload clothing images
 - View clothing details
 - Edit clothing information
 - Replace or remove clothing images
 - Delete clothing items
-- Mark clothing items as favorites
-- Search clothing by name, category, or color
-- Filter clothing by:
-  - Category
-  - Season
-  - Favorites
+- Mark clothing as favorite
+- Search clothing
+- Filter by category, season, and favorites
+- Store color, size, season, and notes
 
 ### Outfit Management
-- Create outfits using wardrobe items
-- Select multiple clothing items for an outfit
-- Edit existing outfits
+
+- Create outfits from wardrobe items
+- Select multiple clothing items
+- Edit saved outfits
 - Delete outfits
-- Add notes to outfits
-- Mark outfits as favorites
+- Add outfit notes
+- Favorite outfits
 - Mark outfits as worn
-- Automatically remove deleted clothing items from existing outfits
-- Automatically remove outfits that become empty after clothing deletion
+- Prevent duplicate clothing items in an outfit
 
 ### Outfit Calendar
-- Schedule saved outfits for specific dates
-- Navigate between months
-- View scheduled outfits directly on calendar days
-- Update an existing scheduled outfit
+
+- Schedule outfits for specific dates
+- Navigate between calendar months
+- View scheduled outfits
+- Change an existing scheduled outfit
 - Remove scheduled outfits
-- Store calendar dates without timezone-related date shifting
+- Validate calendar dates before database operations
 
 ### Wear History
-- Mark outfits as worn
+
+- Record outfits as worn
 - Store wear history in PostgreSQL
-- Display recently worn outfits on the Dashboard
-- Display the correct worn date without timezone conversion issues
+- Display recently worn outfits
+- Preserve date-only values without timezone shifting
 
 ### Dashboard
-The Dashboard displays real data for the logged-in user, including:
+
+The dashboard displays information for the authenticated user, including:
 
 - Total clothing items
-- Favorite clothing items
-- Saved outfits
-- Planned looks
 - Favorite clothing
+- Saved outfits
+- Planned outfits
 - Recently worn outfits
-- Recent outfits
+- Recent saved outfits
 - Upcoming scheduled outfits
 
-## Technologies Used
+---
+
+## Technologies
 
 ### Frontend
+
 - React
 - Vite
 - React Router
@@ -78,28 +83,35 @@ The Dashboard displays real data for the logged-in user, including:
 - CSS
 
 ### Backend
+
 - Node.js
 - Express.js
 - PostgreSQL
 - JSON Web Tokens
 - bcryptjs
 - Multer
+- Helmet
+- express-rate-limit
 
-### Development Tools
+### Testing and Development
+
+- Jest
+- ESLint
 - npm
 - Git
-- PostgreSQL
-- pgAdmin
-- Visual Studio Code 
+- pgAdmin / PostgreSQL
+
+---
 
 ## Project Structure
 
 ```text
-wearhouse/
+WearHouse/
 │
 ├── app/                         # React frontend
 │   ├── src/
 │   │   ├── components/
+│   │   ├── config/
 │   │   ├── data/
 │   │   ├── hooks/
 │   │   ├── services/
@@ -108,6 +120,7 @@ wearhouse/
 │   │   ├── main.jsx
 │   │   └── index.css
 │   │
+│   ├── .env.example
 │   └── package.json
 │
 ├── api/                         # Express backend
@@ -118,17 +131,28 @@ wearhouse/
 │   │   ├── repositories/
 │   │   ├── routes/
 │   │   ├── services/
+│   │   ├── utils/
 │   │   ├── validators/
 │   │   ├── app.js
 │   │   └── server.js
 │   │
+│   ├── tests/
+│   │   ├── authValidator.test.js
+│   │   ├── outfitValidator.test.js
+│   │   └── scheduleValidator.test.js
+│   │
 │   ├── uploads/
 │   ├── .env.example
 │   └── package.json
-│── database/
+│
+├── database/
 │   └── schema.sql
+│
+├── .gitignore
 └── README.md
 ```
+
+---
 
 ## Application Architecture
 
@@ -151,29 +175,43 @@ PostgreSQL
 ```
 
 ### Routes
-Routes define the API endpoints and connect incoming requests to the appropriate controllers.
+
+Routes define API paths and connect HTTP requests to controllers.
 
 ### Controllers
-Controllers receive HTTP requests and responses and communicate with the service layer.
+
+Controllers receive requests, call the appropriate services, and return HTTP responses.
 
 ### Services
-Services contain the application's business logic and validation.
+
+Services contain application business logic, ownership checks, and processing rules.
 
 ### Repositories
-Repositories communicate directly with PostgreSQL and execute SQL queries.
 
-This separation keeps the backend organized and makes the application easier to maintain and extend.
+Repositories contain parameterized PostgreSQL queries and database operations.
+
+### Validators
+
+Validators check request data before it reaches the database.
+
+### Middleware
+
+Middleware handles functionality such as authentication and image uploads.
+
+This separation keeps database logic, business logic, HTTP handling, and validation independent from each other.
+
+---
 
 ## Database
 
-WearHouse uses PostgreSQL.
-
-The main database tables are:
+WearHouse uses PostgreSQL and contains seven main tables.
 
 ### `users`
-Stores registered user information.
 
-Important fields include:
+Stores registered account information.
+
+Important fields:
+
 - `user_id`
 - `first_name`
 - `last_name`
@@ -183,24 +221,15 @@ Important fields include:
 - `created_at`
 
 ### `categories`
+
 Stores clothing categories.
 
-Examples:
-- Tops
-- Shirts
-- Jeans
-- Trousers
-- Shorts
-- Skirts
-- Dresses
-- Jackets
-- Shoes
-- Bags
-
 ### `clothing_items`
+
 Stores clothing belonging to users.
 
 Important fields include:
+
 - `item_id`
 - `user_id`
 - `category_id`
@@ -213,29 +242,189 @@ Important fields include:
 - `notes`
 
 ### `outfits`
-Stores saved outfits.
 
-Important fields include:
-- `outfit_id`
-- `user_id`
-- `name`
-- `notes`
-- `is_favorite`
+Stores outfits created by users.
 
 ### `outfit_items`
-Junction table connecting clothing items with outfits.
 
-This allows one outfit to contain multiple clothing items.
+Junction table connecting outfits and clothing items.
+
+The combination of `outfit_id` and `item_id` forms the composite primary key.
 
 ### `outfit_schedule`
-Stores outfits assigned to specific calendar dates.
+
+Stores outfits assigned to calendar dates.
 
 ### `wear_history`
-Stores records of outfits that users have marked as worn.
 
-## API Endpoints
+Stores records of outfits marked as worn.
 
-### Authentication
+---
+
+# Running WearHouse Locally
+
+## Requirements
+
+Before starting, install:
+
+- Node.js
+- npm
+- PostgreSQL
+- Git
+
+pgAdmin is optional but useful for managing PostgreSQL visually.
+
+---
+
+## 1. Clone the Repository
+
+```bash
+git clone https://github.com/dalyasamad/WearHouse.git
+cd WearHouse
+```
+
+---
+
+## 2. Create the PostgreSQL Database
+
+Create a PostgreSQL database named:
+
+```text
+wearhouse
+```
+
+Using PostgreSQL:
+
+```sql
+CREATE DATABASE wearhouse;
+```
+
+Then connect to the `wearhouse` database and execute:
+
+```text
+database/schema.sql
+```
+
+### Using pgAdmin
+
+1. Create a database named `wearhouse`.
+2. Open the Query Tool for the new database.
+3. Open `database/schema.sql`.
+4. Execute the complete SQL file.
+
+### Using `psql`
+
+From the project root:
+
+```bash
+psql -U postgres -d wearhouse -f database/schema.sql
+```
+
+---
+
+## 3. Configure the Backend
+
+Navigate to:
+
+```bash
+cd api
+```
+
+Install dependencies:
+
+```bash
+npm install
+```
+
+Copy the example environment configuration:
+
+```text
+api/.env.example
+```
+
+and create:
+
+```text
+api/.env
+```
+
+Example:
+
+```env
+PORT=3000
+
+DB_HOST=localhost
+DB_PORT=5432
+DB_NAME=wearhouse
+DB_USER=postgres
+DB_PASSWORD=your_database_password
+
+JWT_SECRET=replace_with_a_long_random_secret
+
+CLIENT_ORIGIN=http://localhost:5173
+```
+
+The real `.env` file must not be committed to Git.
+
+Start the backend:
+
+```bash
+npm run dev
+```
+
+The backend runs locally at:
+
+```text
+http://localhost:3000
+```
+
+---
+
+## 4. Configure the Frontend
+
+Open another terminal and navigate to:
+
+```bash
+cd app
+```
+
+Install dependencies:
+
+```bash
+npm install
+```
+
+Create:
+
+```text
+app/.env.local
+```
+
+using `app/.env.example` as the template.
+
+```env
+VITE_API_URL=http://localhost:3000
+```
+
+Start the frontend:
+
+```bash
+npm run dev
+```
+
+Vite normally runs the frontend at:
+
+```text
+http://localhost:5173
+```
+
+---
+
+# API Endpoints
+
+Protected endpoints require a valid JWT in the request.
+
+## Authentication
 
 ```text
 POST /auth/register
@@ -243,7 +432,22 @@ POST /auth/login
 POST /auth/logout
 ```
 
-### User
+### Registration Example
+
+Request:
+
+```json
+{
+  "first_name": "Test",
+  "last_name": "User",
+  "email": "test@example.com",
+  "password": "WearHouse1!"
+}
+```
+
+---
+
+## User
 
 ```text
 GET    /users/me
@@ -251,7 +455,9 @@ PUT    /users/me
 DELETE /users/me
 ```
 
-### Clothing
+---
+
+## Clothing
 
 ```text
 GET    /clothing
@@ -259,10 +465,15 @@ POST   /clothing
 GET    /clothing/:id
 PUT    /clothing/:id
 DELETE /clothing/:id
+
 POST   /clothing/upload
 ```
 
-### Outfits
+Uploaded image paths are stored as relative `/uploads/...` paths so the application is not tied to a specific backend hostname.
+
+---
+
+## Outfits
 
 ```text
 GET    /outfits
@@ -275,7 +486,24 @@ POST   /outfits/:id/favorite
 POST   /outfits/:id/wear
 ```
 
-### Outfit Schedule
+### Create Outfit Example
+
+Request:
+
+```json
+{
+  "name": "University Outfit",
+  "notes": "Simple everyday outfit",
+  "is_favorite": false,
+  "item_ids": [1, 2, 3]
+}
+```
+
+Duplicate clothing IDs are rejected during validation.
+
+---
+
+## Outfit Schedule
 
 ```text
 GET    /schedules
@@ -284,201 +512,202 @@ PUT    /schedules/:id
 DELETE /schedules/:id
 ```
 
-### Wear History
+### Schedule Example
+
+```json
+{
+  "outfit_id": 5,
+  "scheduled_date": "2026-11-15"
+}
+```
+
+Dates must use valid `YYYY-MM-DD` format. Invalid or impossible calendar dates are rejected before PostgreSQL is called.
+
+---
+
+## Wear History
 
 ```text
 GET /wear-history
 ```
 
-## Custom React Hooks
+Wear-history records are also created when a saved outfit is marked as worn.
 
-WearHouse includes reusable custom React hooks.
+---
 
-### `useForm`
+# Validation
 
-The `useForm` hook centralizes common form behavior such as:
+WearHouse validates user input before database operations.
 
-- Form values
-- Input changes
-- Checkbox changes
-- Validation
-- Setting individual field values
-- Form reset
+Validation includes:
 
-It is used across forms such as:
+- Required registration fields
+- Email format
+- Password strength
+- Required clothing information
+- Valid clothing IDs
+- Required outfit names
+- At least one item per outfit
+- Duplicate outfit item detection
+- Valid schedule outfit IDs
+- Valid `YYYY-MM-DD` dates
+- Impossible calendar dates
 
-- Login
-- Registration
-- Profile
-- Add Clothing
-- Edit Clothing
+Password requirements for new accounts include:
 
-This avoids repeating the same form-state logic in multiple components.
+- Minimum 8 characters
+- At least one uppercase letter
+- At least one lowercase letter
+- At least one number
+- At least one special character
 
-### `useAuth`
+---
 
-The `useAuth` hook handles client-side authentication state.
+# Testing
 
-It manages:
+WearHouse includes automated backend validation tests using Jest.
 
-- The logged-in user
-- JWT token
-- Authentication status
-- Saving a login session
-- Updating stored user information
-- Logout
+The current test suite contains **23 tests across 3 test suites**.
 
-It is used by components including:
+Tests cover:
 
-- Login
-- Dashboard
-- Profile
-- ProtectedRoute
+- Registration validation
+- Login validation
+- Invalid email addresses
+- Password-strength requirements
+- Valid outfit creation
+- Missing outfit names
+- Empty outfits
+- Duplicate clothing IDs
+- Invalid clothing IDs
+- Schedule validation
+- Date formatting
+- Impossible calendar dates
+- Leap-year handling
+- Invalid outfit IDs
 
-## Centralized API Handling
+## Run the Tests
 
-Protected API requests use a reusable `apiFetch` helper.
-
-The helper:
-
-- Automatically attaches the user's JWT token
-- Detects `401 Unauthorized` responses
-- Removes an invalid or expired session
-- Redirects the user to the login page
-
-This avoids repeating authentication logic in every API service.
-
-## Image Uploads
-
-Clothing images are uploaded using **Multer**.
-
-Uploaded files are stored in:
-
-```text
-api/uploads/
-```
-
-The backend exposes this directory through:
-
-```text
-/uploads
-```
-
-Supported image formats include:
-
-- JPG / JPEG
-- PNG
-- WEBP
-
-The maximum upload size is 5 MB.
-
-## Authentication and Security
-
-Passwords are not stored directly in the database.
-
-WearHouse uses:
-
-- `bcryptjs` for password hashing
-- JSON Web Tokens for authenticated requests
-- Protected backend routes
-- User-specific database queries using `user_id`
-
-Each user can only access their own clothing, outfits, schedules, and wear history.
-
-## Running the Project
-
-### Requirements
-
-Before running WearHouse, install:
-
-- Node.js
-- npm
-- PostgreSQL
-
-## Backend Setup
-
-Open a terminal and navigate to the backend:
+Navigate to the backend:
 
 ```bash
 cd api
 ```
 
-Install dependencies:
+Then run:
 
 ```bash
-npm install
+npm test
 ```
 
-Create a `.env` file inside the `api` directory.
-
-Configure the PostgreSQL connection and JWT secret according to the database configuration used by the project.
-
-Example:
-
-```env.example
-PORT=3000
-DB_HOST=localhost
-DB_PORT=5432
-DB_NAME=wearhouse
-DB_USER=postgres
-DB_PASSWORD=your_database_password
-JWT_SECRET=your_secret_key
-```
-
-Start the backend:
-
-```bash
-npm run dev
-```
-
-The backend should run at:
+A successful test run should report:
 
 ```text
-http://localhost:3000
+Test Suites: 3 passed, 3 total
+Tests:       23 passed, 23 total
 ```
 
-### Database Setup
+The current validation tests do not require a PostgreSQL connection and do not modify application data.
 
-Create a PostgreSQL database named:
+---
 
-```text
-wearhouse
+# Linting
 
+The React frontend uses ESLint.
 
-
-## Frontend Setup
-
-Open a second terminal.
-
-Navigate to the frontend:
+Run:
 
 ```bash
 cd app
+npm run lint
 ```
 
-Install dependencies:
+The project should complete linting with no errors or warnings.
 
-```bash
-npm install
-```
+---
 
-Start Vite:
+# Security
 
-```bash
-npm run dev
-```
+WearHouse includes several security measures.
 
-Open the URL shown by Vite in the terminal.
+### Password Security
 
-Usually:
+Passwords are hashed using `bcryptjs` before being stored.
+
+### Authentication
+
+Protected backend routes require a valid JSON Web Token.
+
+### Authorization
+
+Repository and service operations use the authenticated user's ID so users cannot access another user's wardrobe, outfits, schedules, or wear history.
+
+### CORS
+
+The backend limits browser requests to the configured frontend origin using `CLIENT_ORIGIN`.
+
+### Security Headers
+
+Helmet adds standard HTTP security headers.
+
+### Rate Limiting
+
+API requests are rate limited, with stricter limits applied to authentication routes.
+
+### Image Uploads
+
+Image uploads:
+
+- Accept JPG/JPEG, PNG, and WEBP files
+- Have a 5 MB size limit
+- Use generated filenames
+- Determine the saved extension from the accepted MIME type
+
+When a clothing image is replaced or removed, the old uploaded file is deleted.
+
+When a clothing item is deleted, its uploaded image is also deleted.
+
+When a user account is deleted, the user's uploaded clothing images are cleaned from the uploads directory.
+
+---
+
+# Environment and Repository Safety
+
+The following files must not be committed:
 
 ```text
-http://localhost:5173
+.env
+.env.local
+node_modules/
+api/uploads/*
 ```
 
-## Typical Application Flow
+Example environment files are included instead:
 
-A normal WearHouse workflow is:
+```text
+api/.env.example
+app/.env.example
+```
+
+No database passwords or JWT secrets should be stored in the repository.
+
+---
+
+# Image Upload Storage
+
+During local development, clothing images are stored in:
+
+```text
+api/uploads/
+```
+
+This folder contains runtime user-generated data and is intentionally excluded from version control.
+
+A `.gitkeep` file may be used so the empty directory exists after cloning.
+
+---
+
+# Typical Application Flow
 
 ```text
 Register
@@ -500,57 +729,77 @@ Mark Outfit as Worn
 View Dashboard
 ```
 
-All wardrobe, outfit, scheduling, and wear-history data is stored in PostgreSQL and associated with the authenticated user.
+All personal wardrobe data is associated with the authenticated user.
 
-## Important Application Behavior
+---
 
-### Clothing Deletion
+# Important Application Behavior
 
-If a clothing item belongs to an outfit and the clothing item is deleted:
+## Clothing Deletion
+
+If a clothing item is used in an outfit and is deleted:
 
 - The clothing item is removed from the outfit.
-- The remaining outfit is preserved if it still contains clothing.
-- If the deleted clothing item was the final item in an outfit, the empty outfit is automatically deleted.
+- The outfit remains if other clothing items are still part of it.
+- An outfit that becomes empty can be removed automatically.
 
-### Scheduling
+## Scheduling
 
-Only one outfit is stored for a given scheduled date.
+Saved outfits can be assigned to calendar dates and later changed or removed.
 
-Selecting a different outfit for a date updates the existing calendar entry.
+## Dates
 
-### Dates
+Schedule and wear-history dates are treated as date-only values to avoid JavaScript timezone conversion problems.
 
-Calendar dates and wear-history dates are handled as date-only values to avoid JavaScript timezone conversions causing them to appear on the previous day.
+---
 
-## Features Outside the Project Scope
+# Custom React Hooks
 
-WearHouse intentionally does not include:
+## `useForm`
 
-- AI-generated outfit recommendations
-- Automatic clothing recognition
-- Social-media functionality
-- Online shopping
-- Payments
+The reusable `useForm` hook centralizes common form behavior such as:
 
-These were outside the intended scope of the application.
+- Form values
+- Input changes
+- Checkbox changes
+- Validation
+- Resetting forms
+- Updating values programmatically
 
-## Future Improvements
+It is used across several WearHouse forms.
 
-Possible future extensions include:
+## `useAuth`
 
-- User profile-picture uploads
-- Weather-based outfit suggestions
-- Clothing usage statistics
-- Outfit recommendation algorithms
-- Additional wardrobe sorting options
-- Automatic cleanup of unused uploaded image files
-- More detailed wear-history analytics
+The `useAuth` hook handles frontend authentication state including:
 
-## Course
+- Logged-in user
+- JWT token
+- Login state
+- Updating the stored user
+- Logout
+
+---
+
+# Centralized API Handling
+
+Protected frontend requests use the reusable `apiFetch` helper.
+
+It:
+
+- Attaches the JWT token automatically
+- Detects `401 Unauthorized`
+- Clears invalid or expired sessions
+- Redirects unauthenticated users to login
+
+The frontend API base URL is configured using `VITE_API_URL` instead of being hardcoded into individual services.
+
+---
+
+# Course
 
 **CSIS 279 – Advances in Computer Science**  
 University of Balamand
 
 ## Project
 
-**WearHouse – Digital Wardrobe Management Application**
+**WearHouse – Digital Wardrobe and Outfit Planning Web Application**

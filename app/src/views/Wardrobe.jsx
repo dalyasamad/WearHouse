@@ -38,13 +38,9 @@ function Wardrobe() {
   const [season, setSeason] =
     useState("All");
 
-  const [
-    favoritesOnly,
-    setFavoritesOnly,
-  ] = useState(
+  const favoritesOnly =
     searchParams.get("favorites") ===
-      "true"
-  );
+    "true";
 
   const [loading, setLoading] =
     useState(true);
@@ -69,31 +65,24 @@ function Wardrobe() {
   ];
 
   useEffect(() => {
+    async function loadClothing() {
+      try {
+        setLoading(true);
+        setError("");
+
+        const data =
+          await getClothingItems();
+
+        setItems(data);
+      } catch (error) {
+        setError(error.message);
+      } finally {
+        setLoading(false);
+      }
+    }
+
     loadClothing();
   }, []);
-
-  useEffect(() => {
-    setFavoritesOnly(
-      searchParams.get("favorites") ===
-        "true"
-    );
-  }, [searchParams]);
-
-  async function loadClothing() {
-    try {
-      setLoading(true);
-      setError("");
-
-      const data =
-        await getClothingItems();
-
-      setItems(data);
-    } catch (error) {
-      setError(error.message);
-    } finally {
-      setLoading(false);
-    }
-  }
 
   async function handleToggleFavorite(
     itemId
@@ -132,16 +121,16 @@ function Wardrobe() {
         currentItems.map(
           (clothing) =>
             clothing.item_id ===
-            itemId
+              itemId
               ? {
-                  ...clothing,
-                  ...updatedItem,
+                ...clothing,
+                ...updatedItem,
 
-                  // Keep the category name
-                  // used by the frontend.
-                  category:
-                    item.category,
-                }
+                // Keep the category name
+                // used by the frontend.
+                category:
+                  item.category,
+              }
               : clothing
         )
       );
@@ -154,7 +143,7 @@ function Wardrobe() {
     const nextValue =
       !favoritesOnly;
 
-    setFavoritesOnly(nextValue);
+   
 
     const params =
       new URLSearchParams(
@@ -184,7 +173,7 @@ function Wardrobe() {
     setSearch("");
     setCategory("All");
     setSeason("All");
-    setFavoritesOnly(false);
+    
 
     const params =
       new URLSearchParams(
@@ -230,7 +219,7 @@ function Wardrobe() {
         (
           season !== "All Seasons" &&
           item.season ===
-            "All Seasons"
+          "All Seasons"
         );
 
       const matchesFavorite =
@@ -306,11 +295,10 @@ function Wardrobe() {
 
         <button
           type="button"
-          className={`favorites-filter ${
-            favoritesOnly
+          className={`favorites-filter ${favoritesOnly
               ? "active"
               : ""
-          }`}
+            }`}
           onClick={
             toggleFavoritesFilter
           }
@@ -337,7 +325,7 @@ function Wardrobe() {
             <p>
               {filteredItems.length}{" "}
               {filteredItems.length ===
-              1
+                1
                 ? "item"
                 : "items"}
             </p>
@@ -356,7 +344,7 @@ function Wardrobe() {
           </div>
 
           {filteredItems.length >
-          0 ? (
+            0 ? (
             <div className="clothing-grid">
               {filteredItems.map(
                 (item) => (

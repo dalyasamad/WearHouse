@@ -31,37 +31,38 @@ function EditOutfit() {
   const [error, setError] = useState("");
 
   useEffect(() => {
+    async function loadData() {
+      try {
+        setLoading(true);
+        setError("");
+
+        const [wardrobeData, outfitData] =
+          await Promise.all([
+            getClothingItems(),
+            getOutfit(id),
+          ]);
+
+        setWardrobeItems(wardrobeData);
+
+        setOutfitName(outfitData.name || "");
+        setNotes(outfitData.notes || "");
+        setIsFavorite(
+          outfitData.is_favorite || false
+        );
+
+        setSelectedItems(
+          outfitData.items || []
+        );
+      } catch (error) {
+        setError(error.message);
+      } finally {
+        setLoading(false);
+      }
+    }
+
     loadData();
   }, [id]);
 
-  async function loadData() {
-    try {
-      setLoading(true);
-      setError("");
-
-      const [wardrobeData, outfitData] =
-        await Promise.all([
-          getClothingItems(),
-          getOutfit(id),
-        ]);
-
-      setWardrobeItems(wardrobeData);
-
-      setOutfitName(outfitData.name || "");
-      setNotes(outfitData.notes || "");
-      setIsFavorite(
-        outfitData.is_favorite || false
-      );
-
-      setSelectedItems(
-        outfitData.items || []
-      );
-    } catch (error) {
-      setError(error.message);
-    } finally {
-      setLoading(false);
-    }
-  }
 
   const categories = [
     "All",
@@ -259,11 +260,10 @@ function EditOutfit() {
                 <button
                   type="button"
                   key={item.item_id}
-                  className={`creator-wardrobe-item ${
-                    selected
+                  className={`creator-wardrobe-item ${selected
                       ? "selected"
                       : ""
-                  }`}
+                    }`}
                   onClick={() =>
                     toggleItem(item)
                   }

@@ -3,16 +3,17 @@ node_modules/
 api/node_modules/
 app/node_modules/
 
-# Secrets / environment
+# Environment files / secrets
 .env
-api/.env
-app/.env
+.env.local
+.env.*.local
+**/.env
+**/.env.local
+**/.env.*.local
 
-# Keep example environment files
+# Keep examples
 !.env.example
-!api/.env.example
-!app/.env.example
-
+!**/.env.example
 # Build output
 dist/
 app/dist/

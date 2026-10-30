@@ -4,24 +4,11 @@
 
 const scheduleService =
   require("../services/scheduleService");
+  const {
+  validateSchedule,
+} = require("../validators/scheduleValidator");
 
-// Validates the required information for scheduling an outfit.
-// Ensures that an outfit and a scheduled date are provided.
-// Checks that an outfit and date have been supplied.
-function validateSchedule(data) {
-  // Check whether an outfit has been selected.
-  if (!data.outfit_id) {
-    return "Outfit is required.";
-  }
 
-  // Check whether a scheduled date has been provided.
-  if (!data.scheduled_date) {
-    return "Date is required.";
-  }
-
-  // Return null if all required fields are present.
-  return null;
-}
 
 // Retrieves all scheduled outfits belonging to the authenticated user.
 // Retrieves all records associated with the current user.

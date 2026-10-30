@@ -24,9 +24,16 @@ function validateRegister(values) {
     !values.password ||
     !values.confirmPassword
   ) {
-    errors.form =
-      "Please fill in all fields.";
+    errors.form = "Please fill in all fields.";
+    return errors;
+  }
 
+  const emailPattern =
+    /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+
+  if (!emailPattern.test(values.email.trim())) {
+    errors.form =
+      "Please enter a valid email address.";
     return errors;
   }
 
@@ -36,16 +43,44 @@ function validateRegister(values) {
   ) {
     errors.form =
       "Passwords do not match.";
+    return errors;
   }
 
-  if (values.password.length < 6) {
+  if (values.password.length < 8) {
     errors.form =
-      "Password must be at least 6 characters.";
+      "Password must be at least 8 characters.";
+    return errors;
+  }
+
+  if (!/[A-Z]/.test(values.password)) {
+    errors.form =
+      "Password must contain an uppercase letter.";
+    return errors;
+  }
+
+  if (!/[a-z]/.test(values.password)) {
+    errors.form =
+      "Password must contain a lowercase letter.";
+    return errors;
+  }
+
+  if (!/[0-9]/.test(values.password)) {
+    errors.form =
+      "Password must contain a number.";
+    return errors;
+  }
+
+  if (
+    !/[!@#$%^&*(),.?":{}|<>]/.test(
+      values.password
+    )
+  ) {
+    errors.form =
+      "Password must contain a special character.";
   }
 
   return errors;
 }
-
 // Renders the Register page and manages its related state and event handlers.
 function Register() {
   const navigate = useNavigate();

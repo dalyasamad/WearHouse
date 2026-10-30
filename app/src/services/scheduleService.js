@@ -1,9 +1,7 @@
 // Implements business logic between the API controllers and database repositories.
 
-
 import { apiFetch } from "./apiFetch";
-
-const API_URL = "http://localhost:3000";
+import { API_URL } from "../config/api";
 
 // Implements the getSchedules operation for this module.
 export async function getSchedules() {

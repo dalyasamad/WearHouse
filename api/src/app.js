@@ -1,6 +1,7 @@
 // Configures the Express application, its middleware, and mounted API routes.
 
-
+const helmet = require("helmet");
+const rateLimit = require("express-rate-limit");
 const express = require("express");
 const cors = require("cors");
 const path = require("path");
@@ -14,7 +15,46 @@ const historyRoutes =require("./routes/historyRoutes");
 
 const app = express();
 
-app.use(cors());
+app.use(helmet());
+
+app.use(
+  cors({
+    origin:
+      process.env.CLIENT_ORIGIN ||
+      "http://localhost:5173",
+    methods: [
+      "GET",
+      "POST",
+      "PUT",
+      "DELETE",
+    ],
+    allowedHeaders: [
+      "Content-Type",
+      "Authorization",
+    ],
+  })
+);
+const apiLimiter = rateLimit({
+  windowMs: 15 * 60 * 1000,
+  limit: 300,
+  standardHeaders: true,
+  legacyHeaders: false,
+  message: {
+    message:
+      "Too many requests. Please try again later.",
+  },
+});
+const authLimiter = rateLimit({
+  windowMs: 15 * 60 * 1000,
+  limit: 20,
+  standardHeaders: true,
+  legacyHeaders: false,
+  message: {
+    message:
+      "Too many authentication attempts. Please try again later.",
+  },
+});
+app.use(apiLimiter);
 app.use(express.json());
 app.use(
   "/uploads",
@@ -22,7 +62,7 @@ app.use(
 );
 
 // Routes
-app.use("/auth", authRoutes);
+app.use("/auth", authLimiter, authRoutes);
 app.use("/users", userRoutes);
 app.use("/clothing", clothingRoutes);
 app.use("/outfits", outfitRoutes);

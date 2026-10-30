@@ -84,39 +84,39 @@ function EditClothing() {
   ];
 
   useEffect(() => {
-    loadItem();
-  }, [id]);
+    async function loadItem() {
+      try {
+        setLoading(true);
+        setServerError("");
 
-  async function loadItem() {
-    try {
-      setLoading(true);
-      setServerError("");
+        const item =
+          await getClothingItem(id);
 
-      const item =
-        await getClothingItem(id);
+        setValues({
+          name: item.name || "",
+          category: item.category || "",
+          color: item.color || "",
+          size: item.size || "",
+          season: item.season || "",
+          notes: item.notes || "",
+          is_favorite:
+            item.is_favorite || false,
+          image_url:
+            item.image_url || null,
+        });
 
-      setValues({
-        name: item.name || "",
-        category: item.category || "",
-        color: item.color || "",
-        size: item.size || "",
-        season: item.season || "",
-        notes: item.notes || "",
-        is_favorite:
-          item.is_favorite || false,
-        image_url:
-          item.image_url || null,
-      });
-
-      setImagePreview(
-        item.image_url || ""
-      );
-    } catch (error) {
-      setServerError(error.message);
-    } finally {
-      setLoading(false);
+        setImagePreview(
+          item.image_url || ""
+        );
+      } catch (error) {
+        setServerError(error.message);
+      } finally {
+        setLoading(false);
+      }
     }
-  }
+
+    loadItem();
+  }, [id, setValues]);
 
   function handleImageChange(event) {
     const file =
@@ -450,11 +450,11 @@ function EditClothing() {
 
           {(errors.form ||
             serverError) && (
-            <p className="auth-error">
-              {errors.form ||
-                serverError}
-            </p>
-          )}
+              <p className="auth-error">
+                {errors.form ||
+                  serverError}
+              </p>
+            )}
 
           <div className="form-actions">
             <button

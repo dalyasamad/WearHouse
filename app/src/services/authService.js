@@ -1,11 +1,9 @@
 // Implements business logic between the API controllers and database repositories.
 
-
 import { apiFetch } from "./apiFetch";
+import { API_URL } from "../config/api";
 
-const API_URL = "http://localhost:3000";
-
-// Implements the registerUser operation for this module.
+// Registers a new user.
 export async function registerUser(userData) {
   const response = await fetch(
     `${API_URL}/auth/register`,
@@ -29,7 +27,7 @@ export async function registerUser(userData) {
   return data;
 }
 
-// Implements the loginUser operation for this module.
+// Logs a user in.
 export async function loginUser(credentials) {
   const response = await fetch(
     `${API_URL}/auth/login`,

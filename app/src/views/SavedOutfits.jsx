@@ -25,13 +25,13 @@ function sortOutfits(data) {
     (a, b) =>
       new Date(
         b.updated_at ||
-          b.created_at ||
-          0
+        b.created_at ||
+        0
       ) -
       new Date(
         a.updated_at ||
-          a.created_at ||
-          0
+        a.created_at ||
+        0
       )
   );
 }
@@ -73,26 +73,26 @@ function SavedOutfits() {
   ] = useState(null);
 
   useEffect(() => {
+    async function loadOutfits() {
+      try {
+        setLoading(true);
+        setError("");
+
+        const data =
+          await getOutfits();
+
+        setOutfits(
+          sortOutfits(data)
+        );
+      } catch (error) {
+        setError(error.message);
+      } finally {
+        setLoading(false);
+      }
+    }
+
     loadOutfits();
   }, []);
-
-  async function loadOutfits() {
-    try {
-      setLoading(true);
-      setError("");
-
-      const data =
-        await getOutfits();
-
-      setOutfits(
-        sortOutfits(data)
-      );
-    } catch (error) {
-      setError(error.message);
-    } finally {
-      setLoading(false);
-    }
-  }
 
   function showMessage(text) {
     setMessage(text);
@@ -122,12 +122,12 @@ function SavedOutfits() {
       setOutfits((current) =>
         current.map((outfit) =>
           outfit.outfit_id ===
-          outfitId
+            outfitId
             ? {
-                ...outfit,
-                is_favorite:
-                  !outfit.is_favorite,
-              }
+              ...outfit,
+              is_favorite:
+                !outfit.is_favorite,
+            }
             : outfit
         )
       );
@@ -355,11 +355,10 @@ function SavedOutfits() {
 
                       <button
                         type="button"
-                        className={`outfit-favorite-button ${
-                          outfit.is_favorite
+                        className={`outfit-favorite-button ${outfit.is_favorite
                             ? "active"
                             : ""
-                        }`}
+                          }`}
                         onClick={() =>
                           handleFavorite(
                             outfit.outfit_id
@@ -412,7 +411,7 @@ function SavedOutfits() {
                         }
                       >
                         {wornLoadingId ===
-                        outfit.outfit_id
+                          outfit.outfit_id
                           ? "Saving..."
                           : "Mark as Worn"}
                       </button>
