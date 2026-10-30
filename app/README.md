@@ -1,16 +1,105 @@
-# React + Vite
+# WearHouse Frontend
 
-This template provides a minimal setup to get React working in Vite with HMR and some ESLint rules.
+This folder contains the React frontend for WearHouse.
 
-Currently, two official plugins are available:
+WearHouse is a digital wardrobe and outfit-planning application that allows users to manage clothing items, create outfits, schedule outfits, record wear history, and manage their profile.
 
-- [@vitejs/plugin-react](https://github.com/vitejs/vite-plugin-react/blob/main/packages/plugin-react) uses [Oxc](https://oxc.rs)
-- [@vitejs/plugin-react-swc](https://github.com/vitejs/vite-plugin-react/blob/main/packages/plugin-react-swc) uses [SWC](https://swc.rs/)
+## Technologies
 
-## React Compiler
+- React
+- Vite
+- React Router
+- JavaScript
+- CSS
+- ESLint
 
-The React Compiler is not enabled on this template because of its impact on dev & build performances. To add it, see [this documentation](https://react.dev/learn/react-compiler/installation).
+## Setup
 
-## Expanding the ESLint configuration
+Install dependencies:
 
-If you are developing a production application, we recommend using TypeScript with type-aware lint rules enabled. Check out the [TS template](https://github.com/vitejs/vite/tree/main/packages/create-vite/template-react-ts) for information on how to integrate TypeScript and [`typescript-eslint`](https://typescript-eslint.io) in your project.
+```bash
+npm install
+```
+
+Create:
+
+```text
+.env.local
+```
+
+using `.env.example` as the template.
+
+Example:
+
+```env
+VITE_API_URL=http://localhost:3000
+```
+
+Start the frontend:
+
+```bash
+npm run dev
+```
+
+The development server normally runs at:
+
+```text
+http://localhost:5173
+```
+
+## Linting
+
+Run:
+
+```bash
+npm run lint
+```
+
+The project should complete with no ESLint errors or warnings.
+
+## Frontend Structure
+
+```text
+src/
+├── components/
+├── config/
+├── data/
+├── hooks/
+├── services/
+├── views/
+├── App.jsx
+├── main.jsx
+└── index.css
+```
+
+### Components
+
+Reusable interface elements used across the application.
+
+### Views
+
+Pages such as the dashboard, wardrobe, outfit creator, calendar, profile, login, and registration.
+
+### Services
+
+Functions responsible for communication with the Express backend.
+
+### Hooks
+
+Reusable React logic including authentication and form management.
+
+### Config
+
+Contains frontend configuration such as the API base URL and asset URL handling.
+
+## API Configuration
+
+The frontend uses:
+
+```env
+VITE_API_URL
+```
+
+to determine the backend location.
+
+API addresses are not hardcoded inside individual service files.
