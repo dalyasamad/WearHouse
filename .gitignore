@@ -1,0 +1,31 @@
+# Dependencies
+node_modules/
+api/node_modules/
+app/node_modules/
+
+# Secrets / environment
+.env
+api/.env
+app/.env
+
+# Keep example environment files
+!.env.example
+!api/.env.example
+!app/.env.example
+
+# Build output
+dist/
+app/dist/
+api/dist/
+
+# Logs
+*.log
+
+# OS / editor
+.DS_Store
+Thumbs.db
+.vscode/
+
+# Uploaded files
+api/uploads/*
+!api/uploads/.gitkeep
