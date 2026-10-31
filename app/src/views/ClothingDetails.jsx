@@ -1,6 +1,6 @@
 // Renders a WearHouse application page and manages its user interactions.
 
-
+import { getAssetUrl } from "../config/api";
 import {
   useEffect,
   useState,
@@ -158,9 +158,8 @@ function ClothingDetails() {
           <div className="details-image">
             {item.image_url ? (
               <img
-                src={
-                  item.image_url
-                }
+                src={getAssetUrl(item.image_url)}
+                
                 alt={
                   item.name
                 }

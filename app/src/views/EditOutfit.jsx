@@ -1,5 +1,5 @@
 // Renders a WearHouse application page and manages its user interactions.
-
+import { getAssetUrl } from "../config/api";
 
 import { useEffect, useState } from "react";
 import { useNavigate, useParams } from "react-router-dom";
@@ -271,7 +271,7 @@ function EditOutfit() {
                   <div className="creator-item-image">
                     {item.image_url ? (
                       <img
-                        src={item.image_url}
+                        src={getAssetUrl(item.image_url)}
                         alt={item.name}
                       />
                     ) : (
@@ -349,9 +349,7 @@ function EditOutfit() {
                       <div className="canvas-item-image">
                         {item.image_url ? (
                           <img
-                            src={
-                              item.image_url
-                            }
+                            src={getAssetUrl(item.image_url)}
                             alt={
                               item.name
                             }

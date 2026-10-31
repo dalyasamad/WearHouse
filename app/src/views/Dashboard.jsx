@@ -558,7 +558,15 @@ function Dashboard() {
                     }
                     onClick={() =>
                       navigate(
-                        "/calendar"
+                        "/calendar",
+                        {
+                          state: {
+                            selectedDate:
+                              String(
+                                schedule.scheduled_date
+                              ).slice(0, 10),
+                          },
+                        }
                       )
                     }
                   >

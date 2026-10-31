@@ -1,5 +1,5 @@
-// Renders a WearHouse application page and manages its user interactions.
-
+// Displays the outfit planning calendar and lets the user
+// assign, update, and remove saved outfits for specific dates.
 
 import {
   useEffect,
@@ -7,15 +7,16 @@ import {
 } from "react";
 
 import {
+  useLocation,
   useNavigate,
 } from "react-router-dom";
 
 import CustomDropdown from "../components/CustomDropdown";
+import CalendarDay from "../components/CalendarDay";
 
 import {
   getOutfits,
 } from "../services/outfitService";
-import CalendarDay from "../components/CalendarDay";
 
 import {
   getSchedules,
@@ -23,17 +24,82 @@ import {
   deleteSchedule,
 } from "../services/scheduleService";
 
-// Renders the OutfitCalendar page and manages its related state and event handlers.
+// Converts a date value to YYYY-MM-DD.
+// This keeps comparisons consistent when PostgreSQL returns timestamps.
+function normalizeDate(date) {
+  if (!date) {
+    return "";
+  }
+
+  return String(date).slice(
+    0,
+    10
+  );
+}
+
+// Returns the month that should initially be displayed.
+// If Dashboard supplied a date, the calendar opens on that month.
+// Otherwise it opens on the current month.
+function getInitialMonth(
+  requestedDate
+) {
+  if (!requestedDate) {
+    return new Date();
+  }
+
+  const [
+    requestedYear,
+    requestedMonth,
+  ] = requestedDate
+    .split("-")
+    .map(Number);
+
+  if (
+    !requestedYear ||
+    !requestedMonth
+  ) {
+    return new Date();
+  }
+
+  return new Date(
+    requestedYear,
+    requestedMonth - 1,
+    1
+  );
+}
+
+// Renders the Outfit Calendar page and manages
+// calendar selection, scheduling, updates, and removal.
 function OutfitCalendar() {
   const navigate = useNavigate();
+  const location = useLocation();
 
+  // Dashboard can send a specific scheduled date and outfit.
+  const requestedDate =
+    normalizeDate(
+      location.state?.selectedDate
+    ) || null;
+
+  const requestedOutfitId =
+    location.state
+      ?.selectedOutfitId ||
+    null;
+
+  // Initialize directly from navigation state instead of
+  // changing state synchronously inside an effect.
   const [
     currentMonth,
     setCurrentMonth,
-  ] = useState(new Date());
+  ] = useState(() =>
+    getInitialMonth(
+      requestedDate
+    )
+  );
 
-  const [outfits, setOutfits] =
-    useState([]);
+  const [
+    outfits,
+    setOutfits,
+  ] = useState([]);
 
   const [
     schedules,
@@ -43,46 +109,69 @@ function OutfitCalendar() {
   const [
     selectedDate,
     setSelectedDate,
-  ] = useState(null);
+  ] = useState(
+    requestedDate
+  );
 
   const [
     selectedOutfit,
     setSelectedOutfit,
-  ] = useState(null);
+  ] = useState(
+    requestedOutfitId
+  );
 
-  const [loading, setLoading] =
-    useState(true);
+  const [
+    loading,
+    setLoading,
+  ] = useState(true);
 
-  const [saving, setSaving] =
-    useState(false);
+  const [
+    saving,
+    setSaving,
+  ] = useState(false);
 
   const [
     removingScheduleId,
     setRemovingScheduleId,
   ] = useState(null);
 
-  const [error, setError] =
-    useState("");
+  const [
+    error,
+    setError,
+  ] = useState("");
 
-  const [message, setMessage] =
-    useState("");
+  const [
+    message,
+    setMessage,
+  ] = useState("");
 
+  // Loads the user's saved outfits and calendar schedules.
   useEffect(() => {
     async function loadCalendarData() {
       try {
         setLoading(true);
         setError("");
 
-        const [outfitData, scheduleData] =
+        const [
+          outfitData,
+          scheduleData,
+        ] =
           await Promise.all([
             getOutfits(),
             getSchedules(),
           ]);
 
-        setOutfits(outfitData);
-        setSchedules(scheduleData);
+        setOutfits(
+          outfitData
+        );
+
+        setSchedules(
+          scheduleData
+        );
       } catch (error) {
-        setError(error.message);
+        setError(
+          error.message
+        );
       } finally {
         setLoading(false);
       }
@@ -91,6 +180,7 @@ function OutfitCalendar() {
     loadCalendarData();
   }, []);
 
+  // Reloads schedules after a create, update, or delete.
   async function refreshSchedules() {
     const data =
       await getSchedules();
@@ -100,6 +190,7 @@ function OutfitCalendar() {
     return data;
   }
 
+  // Displays a temporary success message.
   function showMessage(text) {
     setMessage(text);
 
@@ -136,6 +227,7 @@ function OutfitCalendar() {
       }
     );
 
+  // Creates a YYYY-MM-DD date for a calendar day.
   function createDateString(day) {
     const monthNumber =
       String(
@@ -154,13 +246,8 @@ function OutfitCalendar() {
     return `${year}-${monthNumber}-${dayNumber}`;
   }
 
-  function normalizeDate(date) {
-    return String(date).slice(
-      0,
-      10
-    );
-  }
-
+  // Builds the blank leading cells and numbered days
+  // used by the monthly calendar grid.
   const calendarCells = [];
 
   for (
@@ -168,7 +255,9 @@ function OutfitCalendar() {
     i < firstDayOffset;
     i++
   ) {
-    calendarCells.push(null);
+    calendarCells.push(
+      null
+    );
   }
 
   for (
@@ -176,9 +265,12 @@ function OutfitCalendar() {
     day <= daysInMonth;
     day++
   ) {
-    calendarCells.push(day);
+    calendarCells.push(
+      day
+    );
   }
 
+  // Moves to the previous month and clears the selection.
   function goToPreviousMonth() {
     setCurrentMonth(
       new Date(
@@ -194,6 +286,7 @@ function OutfitCalendar() {
     setMessage("");
   }
 
+  // Moves to the next month and clears the selection.
   function goToNextMonth() {
     setCurrentMonth(
       new Date(
@@ -209,6 +302,7 @@ function OutfitCalendar() {
     setMessage("");
   }
 
+  // Finds the outfit already scheduled for a calendar day.
   function getScheduledOutfit(day) {
     const dateString =
       createDateString(day);
@@ -221,6 +315,8 @@ function OutfitCalendar() {
     );
   }
 
+  // Selects a calendar date and automatically selects
+  // its existing outfit when one is already scheduled.
   function handleSelectDate(
     dateString,
     scheduled
@@ -239,6 +335,8 @@ function OutfitCalendar() {
     setMessage("");
   }
 
+  // Saves a new schedule or replaces the outfit
+  // already assigned to the selected date.
   async function handleScheduleOutfit() {
     if (
       !selectedDate ||
@@ -256,7 +354,8 @@ function OutfitCalendar() {
         (schedule) =>
           normalizeDate(
             schedule.scheduled_date
-          ) === selectedDate
+          ) ===
+          selectedDate
       );
 
     try {
@@ -279,12 +378,15 @@ function OutfitCalendar() {
           : "Outfit added to calendar."
       );
     } catch (error) {
-      setError(error.message);
+      setError(
+        error.message
+      );
     } finally {
       setSaving(false);
     }
   }
 
+  // Removes an outfit from a scheduled date.
   async function handleRemoveSchedule(
     schedule
   ) {
@@ -307,14 +409,18 @@ function OutfitCalendar() {
           schedule.scheduled_date
         )
       ) {
-        setSelectedOutfit(null);
+        setSelectedOutfit(
+          null
+        );
       }
 
       showMessage(
         "Outfit removed from calendar."
       );
     } catch (error) {
-      setError(error.message);
+      setError(
+        error.message
+      );
     } finally {
       setRemovingScheduleId(
         null
@@ -322,6 +428,8 @@ function OutfitCalendar() {
     }
   }
 
+  // Converts YYYY-MM-DD into a readable date
+  // for the planning sidebar.
   function formatSelectedDate(
     dateString
   ) {
@@ -333,14 +441,20 @@ function OutfitCalendar() {
       selectedYear,
       selectedMonth,
       selectedDay,
-    ] = dateString.split("-");
+    ] =
+      dateString.split("-");
 
     const date =
       new Date(
-        Number(selectedYear),
-        Number(selectedMonth) -
-        1,
-        Number(selectedDay)
+        Number(
+          selectedYear
+        ),
+        Number(
+          selectedMonth
+        ) - 1,
+        Number(
+          selectedDay
+        )
       );
 
     return date.toLocaleDateString(
@@ -363,11 +477,12 @@ function OutfitCalendar() {
   const selectedSchedule =
     selectedDate
       ? schedules.find(
-        (schedule) =>
-          normalizeDate(
-            schedule.scheduled_date
-          ) === selectedDate
-      )
+          (schedule) =>
+            normalizeDate(
+              schedule.scheduled_date
+            ) ===
+            selectedDate
+        )
       : null;
 
   return (
@@ -406,7 +521,6 @@ function OutfitCalendar() {
         </div>
       ) : (
         <div className="calendar-layout">
-
           <section className="calendar-card">
             <div className="calendar-header">
               <button
@@ -420,7 +534,8 @@ function OutfitCalendar() {
               </button>
 
               <h2>
-                {monthName} {year}
+                {monthName}{" "}
+                {year}
               </h2>
 
               <button
@@ -446,7 +561,10 @@ function OutfitCalendar() {
 
             <div className="calendar-grid">
               {calendarCells.map(
-                (day, index) => {
+                (
+                  day,
+                  index
+                ) => {
                   if (!day) {
                     return (
                       <div
@@ -457,24 +575,35 @@ function OutfitCalendar() {
                   }
 
                   const dateString =
-                    createDateString(day);
+                    createDateString(
+                      day
+                    );
 
                   const scheduled =
-                    getScheduledOutfit(day);
+                    getScheduledOutfit(
+                      day
+                    );
 
                   return (
                     <CalendarDay
-                      key={dateString}
+                      key={
+                        dateString
+                      }
                       day={day}
-                      dateString={dateString}
+                      dateString={
+                        dateString
+                      }
                       selected={
                         selectedDate ===
                         dateString
                       }
-                      scheduled={scheduled}
+                      scheduled={
+                        scheduled
+                      }
                       removing={
                         removingScheduleId ===
-                        scheduled?.schedule_id
+                        scheduled
+                          ?.schedule_id
                       }
                       onSelect={
                         handleSelectDate
@@ -503,7 +632,7 @@ function OutfitCalendar() {
                 </p>
 
                 {outfits.length >
-                  0 ? (
+                0 ? (
                   <>
                     <div className="form-group">
                       <label>
@@ -518,7 +647,9 @@ function OutfitCalendar() {
                         }
                         placeholder="Choose an outfit"
                         options={outfits.map(
-                          (outfit) =>
+                          (
+                            outfit
+                          ) =>
                             outfit.name
                         )}
                         onChange={(
@@ -591,7 +722,6 @@ function OutfitCalendar() {
               </div>
             )}
           </aside>
-
         </div>
       )}
     </div>

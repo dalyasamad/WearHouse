@@ -9,6 +9,7 @@ import {
 
 import CustomDropdown from "../components/CustomDropdown";
 import useForm from "../hooks/useForm";
+import { getAssetUrl } from "../config/api";
 
 import {
   getClothingItem,
@@ -106,7 +107,11 @@ function EditClothing() {
         });
 
         setImagePreview(
-          item.image_url || ""
+          item.image_url
+            ? getAssetUrl(
+                item.image_url
+              )
+            : ""
         );
       } catch (error) {
         setServerError(error.message);
