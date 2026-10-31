@@ -69,6 +69,25 @@ The dashboard displays information for the authenticated user, including:
 - Recent saved outfits
 - Upcoming scheduled outfits
 
+### Weather Smart Pick
+
+WearHouse includes a weather-based outfit recommendation feature on the dashboard.
+
+The user can search for a city, and the frontend retrieves current weather information using the Open-Meteo geocoding and forecast APIs. Open-Meteo does not require an API key for this use case.
+
+The recommendation logic is rule-based rather than AI-generated. Current temperature is divided into weather bands:
+
+- Cold: below 10°C
+- Cool: 10°C to below 16°C
+- Mild: 16°C to below 22°C
+- Warm: 22°C to below 28°C
+- Hot: 28°C and above
+
+WearHouse then selects suitable clothing from the user's own wardrobe using clothing categories and seasons. Recommendations are built using outfit slots such as a top, bottom, shoes, and an optional jacket. Rain or colder conditions can also trigger a jacket recommendation.
+
+Users can regenerate a recommendation and save the suggested combination as a normal WearHouse outfit.
+
+If weather data cannot be retrieved, the weather feature displays an error without preventing the rest of the dashboard from working.
 ---
 
 ## Technologies
@@ -567,7 +586,9 @@ Password requirements for new accounts include:
 
 WearHouse includes automated backend validation tests using Jest.
 
-The current test suite contains **23 tests across 3 test suites**.
+The current test suite contains ** 37 tests
+8 test suites**.
+The backend test suite includes validator tests and Supertest API tests covering authentication, registration, ownership protection, outfit flows, and schedule flows.
 
 Tests cover:
 
@@ -603,8 +624,8 @@ npm test
 A successful test run should report:
 
 ```text
-Test Suites: 3 passed, 3 total
-Tests:       23 passed, 23 total
+Test Suites: 8 passed, 8 total
+Tests:       37 passed, 37 total
 ```
 
 The current validation tests do not require a PostgreSQL connection and do not modify application data.

@@ -83,6 +83,16 @@ app.get("/", (req, res) => {
     message: "WearHouse API Running",
   });
 });
+// Returns JSON for routes that do not exist.
+app.use((req, res) => {
+  return res
+    .status(404)
+    .json({
+      message: "Route not found.",
+    });
+});
+
 app.use(errorHandler);
+
 
 module.exports = app;

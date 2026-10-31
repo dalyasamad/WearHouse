@@ -1,7 +1,7 @@
 // Displays the user's wardrobe overview, recent activity,
 // weather-based recommendations, saved outfits, and planned outfits.
 
-import { useEffect, useState } from "react";
+
 import { useNavigate } from "react-router-dom";
 
 import useAuth from "../hooks/useAuth";
@@ -10,11 +10,7 @@ import { getAssetUrl } from "../config/api";
 import WeatherSmartPick from "../components/WeatherSmartPick";
 import DashboardStatCard from "../components/DashboardStatCard";
 import DashboardSectionHeader from "../components/DashboardSectionHeader";
-
-import { getClothingItems } from "../services/clothingService";
-import { getOutfits } from "../services/outfitService";
-import { getSchedules } from "../services/scheduleService";
-import { getWearHistory } from "../services/historyService";
+import useDashboardData from "../hooks/useDashboardData";
 
 // Parses a YYYY-MM-DD value as a local calendar date.
 function parseDateOnly(dateValue) {
@@ -52,56 +48,16 @@ function Dashboard() {
   const firstName =
     user?.first_name || "User";
 
-  const [clothing, setClothing] =
-    useState([]);
 
-  const [outfits, setOutfits] =
-    useState([]);
 
-  const [schedules, setSchedules] =
-    useState([]);
-
-  const [wearHistory, setWearHistory] =
-    useState([]);
-
-  const [loading, setLoading] =
-    useState(true);
-
-  const [error, setError] =
-    useState("");
-
-  // Loads all dashboard data in parallel.
-  useEffect(() => {
-    async function loadDashboard() {
-      try {
-        setLoading(true);
-        setError("");
-
-        const [
-          clothingData,
-          outfitData,
-          scheduleData,
-          historyData,
-        ] = await Promise.all([
-          getClothingItems(),
-          getOutfits(),
-          getSchedules(),
-          getWearHistory(),
-        ]);
-
-        setClothing(clothingData);
-        setOutfits(outfitData);
-        setSchedules(scheduleData);
-        setWearHistory(historyData);
-      } catch (error) {
-        setError(error.message);
-      } finally {
-        setLoading(false);
-      }
-    }
-
-    loadDashboard();
-  }, []);
+  const {
+    clothing,
+    outfits,
+    schedules,
+    wearHistory,
+    loading,
+    error,
+  } = useDashboardData();
 
   // Shows up to four recently updated favorite items.
   const favoriteItems = clothing
@@ -112,13 +68,13 @@ function Dashboard() {
       (a, b) =>
         new Date(
           b.updated_at ||
-            b.created_at ||
-            0
+          b.created_at ||
+          0
         ) -
         new Date(
           a.updated_at ||
-            a.created_at ||
-            0
+          a.created_at ||
+          0
         )
     )
     .slice(0, 4);
@@ -131,13 +87,13 @@ function Dashboard() {
       (a, b) =>
         new Date(
           b.updated_at ||
-            b.created_at ||
-            0
+          b.created_at ||
+          0
         ) -
         new Date(
           a.updated_at ||
-            a.created_at ||
-            0
+          a.created_at ||
+          0
         )
     )
     .slice(0, 2);
@@ -481,7 +437,7 @@ function Dashboard() {
           />
 
           {recentOutfits.length >
-          0 ? (
+            0 ? (
             <div className="dashboard-outfits">
               {recentOutfits.map(
                 (outfit) => (
@@ -499,7 +455,7 @@ function Dashboard() {
                     <div className="dashboard-outfit-preview">
                       {outfit.items
                         ?.length >
-                      0 ? (
+                        0 ? (
                         outfit.items
                           .slice(
                             0,
@@ -591,7 +547,7 @@ function Dashboard() {
           />
 
           {upcomingOutfits.length >
-          0 ? (
+            0 ? (
             <div className="dashboard-upcoming-list">
               {upcomingOutfits.map(
                 (schedule) => (
