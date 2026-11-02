@@ -135,6 +135,7 @@ export function createWeatherRecommendation(
     ];
 
     bottomCategories = [
+      "Jeans",
       "Shorts",
       "Skirts",
     ];
@@ -151,6 +152,7 @@ export function createWeatherRecommendation(
     ];
 
     bottomCategories = [
+      "Jeans",
       "Shorts",
       "Skirts",
       "Trousers",

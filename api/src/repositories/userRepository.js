@@ -1,7 +1,5 @@
 // Contains PostgreSQL queries for retrieving and modifying application records.
 
-
-
 const pool = require("../config/db");
 
 // Searches for a user account using an email address.
@@ -9,11 +7,8 @@ const pool = require("../config/db");
 // Looks up an account by its email address.
 async function findByEmail(email) {
   const result = await pool.query(
-    `
-    SELECT *
-    FROM users
-    WHERE LOWER(email) = LOWER($1)
-    `,
+    `SELECT *FROM users
+    WHERE LOWER(email) = LOWER($1) `,
     [email]
   );
 
@@ -26,8 +21,7 @@ async function findByEmail(email) {
 // Queries one record by identifier.
 async function findById(userId) {
   const result = await pool.query(
-    `
-    SELECT
+    ` SELECT
       user_id,
       first_name,
       last_name,
@@ -35,8 +29,7 @@ async function findById(userId) {
       profile_picture,
       created_at
     FROM users
-    WHERE user_id = $1
-    `,
+    WHERE user_id = $1 `,
     [userId]
   );
 
@@ -47,36 +40,12 @@ async function findById(userId) {
 // Creates a new user account with the provided registration information.
 // Stores the email in lowercase and saves the supplied password hash.
 // Inserts a new user record into the database.
-async function createUser({
-  first_name,
-  last_name,
-  email,
-  password_hash,
-}) {
+async function createUser({first_name,last_name,email,password_hash,}) {
   const result = await pool.query(
-    `
-    INSERT INTO users (
-      first_name,
-      last_name,
-      email,
-      password_hash
-    )
+    `INSERT INTO users (first_name,last_name,email,password_hash)
     VALUES ($1, $2, $3, $4)
-
-    RETURNING
-      user_id,
-      first_name,
-      last_name,
-      email,
-      profile_picture,
-      created_at
-    `,
-    [
-      first_name,
-      last_name,
-      email.toLowerCase(),
-      password_hash,
-    ]
+    RETURNING user_id,first_name,last_name,email,profile_picture,created_at `,
+    [first_name,last_name,email.toLowerCase(),password_hash,]
   );
 
   // Return the newly created user's profile information.

@@ -1,7 +1,5 @@
 // Starts the backend HTTP server.
 
-
-
 require("dotenv").config();
 
 const {
