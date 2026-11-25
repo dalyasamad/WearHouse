@@ -258,6 +258,7 @@ function Wardrobe() {
         <button
           type="button"
           className="primary-button"
+        
           onClick={() =>
             navigate(
               "/clothing/add"

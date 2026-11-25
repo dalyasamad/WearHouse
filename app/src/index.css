@@ -78,7 +78,7 @@ button, input, textarea, select { font-family: var(--font-body); }
 
 /* Wardrobe */
 .wardrobe-controls { display: flex; align-items: center; flex-wrap: wrap; gap: 12px; margin-bottom: 16px; }
-.search-box { width: 290px; height: 46px; display: flex; align-items: center; padding: 0 16px; background: white; border: 1px solid var(--border); border-radius: 14px; transition: 0.2s ease; }
+.search-box { width: 290px; height: 46px; display: flex; align-items: center;color:green; padding: 0 16px; background: white; border: 1px solid var(--border); border-radius: 14px; transition: 0.2s ease; }
 .search-box:focus-within { border-color: var(--rose); }
 .search-box span { margin-right: 10px; color: #a67b86; font-size: 21px; }
 .search-box input { width: 100%; padding: 0; border: none; outline: none; background: transparent; color: #43373a; font-size: 14px; }
@@ -112,7 +112,7 @@ button, input, textarea, select { font-family: var(--font-body); }
 .clothing-card-content p { margin: 0; color: var(--text-muted); font-size: 12px; }
 .clothing-card-details { display: flex; flex-wrap: wrap; gap: 7px; margin-top: 14px; }
 .clothing-card-details span { padding: 5px 9px; background: var(--rose-lighter); border-radius: 8px; color: #8b5c68; font-size: 11px; }
-.clothing-view-button { width: 100%; margin-top: 15px; }
+.clothing-view-button { width: 100%; margin-top: 15px; color:green;}
 .clothing-info { padding: 16px; }
 .clothing-title-row { display: flex; align-items: flex-start; justify-content: space-between; gap: 12px; }
 .clothing-title-row h3 { margin: 0; font-size: 18px; font-weight: 500; }

@@ -164,7 +164,7 @@ function AddClothing() {
               />
             ) : (
               <div className="upload-placeholder">
-                <span>Upload Image</span>
+                <span >Upload Image</span>
 
                 <p>
                   JPG, PNG or WEBP
